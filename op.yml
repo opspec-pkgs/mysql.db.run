@@ -1,0 +1,69 @@
+description: runs a MySQL database
+name: github.com/opspec-pkgs/mysql.db.run
+opspec: 0.1.6
+version: 1.0.0
+inputs:
+  dbDataRootDir:
+    dir:
+      description: directory to put the database data folder
+  dbUseNativePassword:
+    boolean:
+      description: true to use old mysql native password and false to use new MySQL 8 password
+      default: false
+  dbSchema:
+    string:
+      description: name of the database to be created
+      constraints: { minLength: 1 }
+  dbUsername:
+    string:
+      description: username to connect to the database
+      constraints: { minLength: 1 }
+  dbPassword:
+    string:
+      description: password to connect to the database
+      constraints: { minLength: 1 }
+run:
+  serial:
+    - container:
+        image: { ref: 'alpine:3.8' }
+        dirs: { 
+          '/dbDataRootDir': $(dbDataRootDir),
+          '/op': $(/) 
+        }
+        workDir: '/dbDataRootDir'
+        envVars: { dbUseNativePassword }
+        cmd:
+          - sh
+          - -ce
+          - |
+            if [ ! -d ./data ]; then
+                mkdir ./data
+            fi
+
+            if [ ! -d ./conf ]; then
+                mkdir ./conf
+            fi
+
+            if [ $dbUseNativePassword == "false" ]; then
+              cp /op/mysqld_settings.cnf ./conf
+              echo using Mysql8 new password standard
+            fi
+
+            if [ $dbUseNativePassword == "true" ]; then
+              cp /op/mysqld_settings_native_pwd.cnf ./conf/mysqld_settings.cnf
+              echo using Mysql old native password standard
+            fi
+
+            exit 0
+    - container:
+        image: { ref: 'mysql:8.0.13' }
+        name: mysqldb
+        files:
+          /etc/mysql/conf.d/mysqld_settings.cnf: $(dbDataRootDir/conf/mysqld_settings.cnf) 
+        dirs: { '/var/lib/mysql': $(dbDataRootDir/data) }
+        envVars:
+          MYSQL_USER: $(dbUsername)
+          MYSQL_PASSWORD: $(dbPassword)
+          MYSQL_DATABASE: $(dbSchema)
+          MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+        ports: { '3306': '3306' }
