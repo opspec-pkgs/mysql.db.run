@@ -15,26 +15,26 @@ the op uses [![opspec 0.1.6](https://img.shields.io/badge/opspec-0.1.6-brightgre
 ## Install
 
 ```shell
-opctl op install github.com/opspec-pkgs/mysql.db.run#1.0.0
+opctl op install github.com/opspec-pkgs/mysql.db.run#1.0.1
 ```
 
 ## Run
 
 ```
-opctl run github.com/opspec-pkgs/mysql.db.run#1.0.0
+opctl run github.com/opspec-pkgs/mysql.db.run#1.0.1
 ```
 
 ## Compose
 
 ```yaml
 op:
-  ref: github.com/opspec-pkgs/mysql.db.run#1.0.0
+  ref: github.com/opspec-pkgs/mysql.db.run#1.0.1
   inputs:
     # required
     dbDataRootDir:
-    dbUsername:
     dbPassword:
     dbSchema:
+    dbUsername:
     ### optional; uncomment to override default(s)
     # dbUseNativePassword: false
 ```
