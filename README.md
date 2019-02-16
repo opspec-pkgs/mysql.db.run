@@ -32,9 +32,9 @@ op:
   inputs:
     # required
     dbDataRootDir:
+    dbUsername:
     dbPassword:
     dbSchema:
-    dbUsername:
     ### optional; uncomment to override default(s)
     # dbUseNativePassword: false
 ```

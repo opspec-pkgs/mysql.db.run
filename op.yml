@@ -1,7 +1,7 @@
 description: runs a MySQL database
 name: github.com/opspec-pkgs/mysql.db.run
 opspec: 0.1.6
-version: 1.0.0
+version: 1.0.1
 inputs:
   dbDataRootDir:
     dir:
@@ -21,6 +21,7 @@ inputs:
   dbPassword:
     string:
       description: password to connect to the database
+      isSecret: true
       constraints: { minLength: 1 }
 run:
   serial:
@@ -31,11 +32,16 @@ run:
           '/op': $(/) 
         }
         workDir: '/dbDataRootDir'
-        envVars: { dbUseNativePassword }
+        envVars: { dbUseNativePassword, dbUsername }
         cmd:
           - sh
           - -ce
           - |
+            if [ $dbUsername == "root" ]; then
+              echo ERROR: dbUsername can\'t be root!
+              exit 1
+            fi
+
             if [ ! -d ./data ]; then
                 mkdir ./data
             fi
