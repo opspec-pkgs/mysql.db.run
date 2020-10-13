@@ -1,32 +1,36 @@
-description: runs a MySQL database
+description: Runs a MySQL database.
 name: github.com/opspec-pkgs/mysql.db.run
 opspec: 0.1.6
-version: 1.0.1
+version: 1.0.2
 inputs:
   dbDataRootDir:
     dir:
-      description: directory to put the database data folder
+      description: Directory to put the database data folder.
   dbUseNativePassword:
     boolean:
-      description: true to use old mysql native password and false to use new MySQL 8 password
+      description: True to use old mysql native password and false to use new MySQL 8 password.
       default: false
   dbSchema:
     string:
-      description: name of the database to be created
+      description: Name of the database to be created.
       constraints: { minLength: 1 }
   dbUsername:
     string:
-      description: username to connect to the database
+      description: Username to connect to the database.
       constraints: { minLength: 1 }
   dbPassword:
     string:
-      description: password to connect to the database
+      description: Password to connect to the database.
       isSecret: true
       constraints: { minLength: 1 }
+  dbHostname:
+    string:
+      description: Name for the PostgreSQL container.
+      default: mysqldb
 run:
   serial:
     - container:
-        image: { ref: 'alpine:3.8' }
+        image: { ref: 'alpine:3.12' }
         dirs: { 
           '/dbDataRootDir': $(dbDataRootDir),
           '/op': $(/) 
@@ -62,8 +66,8 @@ run:
 
             exit 0
     - container:
-        image: { ref: 'mysql:8.0.13' }
-        name: mysqldb
+        image: { ref: 'mysql:8.0.21' }
+        name: $(dbHostname)
         files:
           /etc/mysql/conf.d/mysqld_settings.cnf: $(dbDataRootDir/conf/mysqld_settings.cnf) 
         dirs: { '/var/lib/mysql': $(dbDataRootDir/data) }
